@@ -52,6 +52,7 @@ namespace MediaCompositionDemo
             var source = MediaSource.CreateFromMediaStreamSource(streamSource);
             mediaPlayerElement.Source = source;
         }
+
         private async void AddClip_Click(object sender, RoutedEventArgs e)
         {
             Windows.Storage.Pickers.FileOpenPicker fileOpenPicker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -61,13 +62,13 @@ namespace MediaCompositionDemo
             if (file == null)
                 return;
             MediaClip clip = await MediaClip.CreateFromFileAsync(file);
-            
             mediaComposition.Clips.Add(clip);
 
             UpdateSource();
         }
 
         System.Threading.SynchronizationContext SynchronizationContext = System.Threading.SynchronizationContext.Current;
+
         private async void SaveClip_Click(object sender, RoutedEventArgs e)
         {
             Windows.Storage.Pickers.FileSavePicker fileSavePicker = new Windows.Storage.Pickers.FileSavePicker();
@@ -154,6 +155,7 @@ namespace MediaCompositionDemo
         GraphicsCaptureSession _session = null;
         TimeSpan _timeSpan;
         long performanceFrequency;
+
         private async void CpatureScreen_Click(object sender, RoutedEventArgs e)
         {
             Windows.Graphics.Capture.GraphicsCapturePicker graphicsCapturePicker = new Windows.Graphics.Capture.GraphicsCapturePicker();
@@ -164,15 +166,14 @@ namespace MediaCompositionDemo
             CanvasDevice canvasDevice = new CanvasDevice();
             _franePool = Direct3D11CaptureFramePool.Create(canvasDevice, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 2, graphicsCaptureItem.Size);
 
-            _franePool.FrameArrived +=(s, args) => 
+            _franePool.FrameArrived +=async (s, args) => 
             {
                 using (var frame = _franePool.TryGetNextFrame())
                 {
                     var canvasBitmap = CanvasBitmap.CreateFromDirect3D11Surface(canvasDevice, frame.Surface);
 
-                    //await CreateClipInImageFile(canvasBitmap);
+                    //await CpatureToImageFile(canvasBitmap);
                     CreateClipInMemory(canvasDevice, canvasBitmap);
-
                 }
             };
 
@@ -183,11 +184,14 @@ namespace MediaCompositionDemo
 
             _session = _franePool.CreateCaptureSession(graphicsCaptureItem);
 
+            timeSpans = new List<TimeSpan>();
+            count = 0;
+
             _session.StartCapture();
+
             QueryPerformanceCounter(out long qpc);
             QueryPerformanceFrequency(out long frq);
             performanceFrequency = frq;
-
             var milliseconds = 1000f * qpc / performanceFrequency;
             _timeSpan = TimeSpan.FromMilliseconds(milliseconds);
 
@@ -196,8 +200,34 @@ namespace MediaCompositionDemo
             btnCaptureStop.Visibility = Visibility.Visible;
             btnCaptureStart.Visibility = Visibility.Collapsed;
         }
-        
-        public void CreateClipInMemory(CanvasDevice canvasDevice, CanvasBitmap canvasBitmap)
+
+        private async void CaptureStop_Click(object sender, RoutedEventArgs e)
+        {
+            _session.Dispose();
+            _franePool.Dispose();
+
+            _audioGraph?.Stop();
+            if (_audioFile != null)
+            {
+                var audioTrack = await BackgroundAudioTrack.CreateFromFileAsync(_audioFile);
+                mediaComposition.BackgroundAudioTracks.Add(audioTrack);
+            }
+
+            //await CreateClipFromImageFile();
+
+            UpdateSource();
+
+            btnCaptureStop.Visibility = Visibility.Collapsed;
+            btnCaptureStart.Visibility = Visibility.Visible;
+        }
+
+        #region Capture screen and create MediaClip in Memory
+        /// <summary>
+        /// TODO: need to dispose CanvasRenderTarget.
+        /// </summary>
+        /// <param name="canvasDevice"></param>
+        /// <param name="canvasBitmap"></param>
+        private void CreateClipInMemory(CanvasDevice canvasDevice, CanvasBitmap canvasBitmap)
         {
             CanvasRenderTarget rendertarget = null;
             QueryPerformanceCounter(out long counter);
@@ -210,9 +240,6 @@ namespace MediaCompositionDemo
                     ds.Clear(Colors.Transparent);
                     ds.DrawImage(canvasBitmap);
                 }
-
-                
-
                 mediaComposition.Clips.Add(MediaClip.CreateFromSurface(rendertarget, currentTime - _timeSpan));
             }
             catch
@@ -221,12 +248,15 @@ namespace MediaCompositionDemo
             finally
             {
                 _timeSpan = currentTime;
-                //rendertarget?.Dispose();
             }
-            
         }
+        #endregion
+
+        #region Capture screen and save it to disk.
         int count = 0;
-        private async Task CreateClipInImageFile(CanvasBitmap WB)
+        List<TimeSpan> timeSpans = new List<TimeSpan>();
+
+        private async Task CpatureToImageFile(CanvasBitmap WB)
         {
             try
             {
@@ -254,36 +284,30 @@ namespace MediaCompositionDemo
                 var milliseconds = 1000f * qpc / performanceFrequency;
                 var currentTime = TimeSpan.FromMilliseconds(milliseconds);
 
-                
-                mediaComposition.Clips.Add(await MediaClip.CreateFromImageFileAsync(file, currentTime-_timeSpan));
+                timeSpans.Add(currentTime - _timeSpan);
                 _timeSpan = currentTime;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
             }
         }
 
-        private async void CaptureStop_Click(object sender, RoutedEventArgs e)
+        public async Task CreateClipFromImageFile()
         {
-            _session.Dispose();
-            _franePool.Dispose();
-
-            _audioGraph?.Stop();
-            if(_audioFile!=null)
+            for (int i = 0; i < count; i++)
             {
-                var audioTrack = await BackgroundAudioTrack.CreateFromFileAsync(_audioFile);
-                mediaComposition.BackgroundAudioTracks.Add(audioTrack);
+                string FileName = $"capture{i}.";
+                FileName += "jpg";
+                var file = await Windows.Storage.ApplicationData.Current.TemporaryFolder.GetFileAsync(FileName);
+
+                mediaComposition.Clips.Add(await MediaClip.CreateFromImageFileAsync(file, timeSpans[i]));
             }
-            
-
-            UpdateSource();
-
-            btnCaptureStop.Visibility = Visibility.Collapsed;
-            btnCaptureStart.Visibility = Visibility.Visible;
         }
+        #endregion
 
         AudioGraph _audioGraph;
         IStorageFile _audioFile;
+
         public async void CaptureAudio()
         {
             AudioGraphSettings audioGraphSettings = new AudioGraphSettings(Windows.Media.Render.AudioRenderCategory.Speech);
@@ -319,6 +343,7 @@ namespace MediaCompositionDemo
 
         [DllImport("Kernel32.dll")]
         public static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
+
         [DllImport("Kernel32.dll")]
         public static extern bool QueryPerformanceFrequency(out long lpFrequency);
     }
