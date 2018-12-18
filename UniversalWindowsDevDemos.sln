@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioFrameInputNodeDemo", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaCompositionDemo", "MediaCompositionDemo\MediaCompositionDemo.csproj", "{FED26F88-ACA6-4E5F-BD36-ECF5D386839D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiebaLoadingWave", "TiebaLoadingWave\TiebaLoadingWave.csproj", "{BD25C836-1EAC-4662-8823-B2A7CE83575E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -53,6 +55,24 @@ Global
 		{FED26F88-ACA6-4E5F-BD36-ECF5D386839D}.Release|x86.ActiveCfg = Release|x86
 		{FED26F88-ACA6-4E5F-BD36-ECF5D386839D}.Release|x86.Build.0 = Release|x86
 		{FED26F88-ACA6-4E5F-BD36-ECF5D386839D}.Release|x86.Deploy.0 = Release|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|ARM.ActiveCfg = Debug|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|ARM.Build.0 = Debug|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|ARM.Deploy.0 = Debug|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x64.ActiveCfg = Debug|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x64.Build.0 = Debug|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x64.Deploy.0 = Debug|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x86.ActiveCfg = Debug|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x86.Build.0 = Debug|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Debug|x86.Deploy.0 = Debug|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|ARM.ActiveCfg = Release|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|ARM.Build.0 = Release|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|ARM.Deploy.0 = Release|ARM
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x64.ActiveCfg = Release|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x64.Build.0 = Release|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x64.Deploy.0 = Release|x64
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x86.ActiveCfg = Release|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x86.Build.0 = Release|x86
+		{BD25C836-1EAC-4662-8823-B2A7CE83575E}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,15 @@
+﻿<Page
+    x:Class="Win2dDemos.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Win2dDemos"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <canvas:CanvasAnimatedControl x:Name="canvas" Margin="40" Draw="canvas_DrawAnimated" CreateResources="canvas_CreateResources"/>
+    </Grid>
+</Page>
